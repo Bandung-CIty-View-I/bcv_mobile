@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "632085793199",
+    "firebase_url": "https://bcv1-f450b-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "bcv1-f450b",
+    "storage_bucket": "bcv1-f450b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:632085793199:android:e4ef41aaa70c963ad2c75a",
+        "android_client_info": {
+          "package_name": "com.example.pro_tav1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrFK8HL0bBK7QaVm5dsQJ9Gk9Nm5-LmlU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
