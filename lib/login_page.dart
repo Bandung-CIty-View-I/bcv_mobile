@@ -221,7 +221,8 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   const SizedBox(height: 25.0),
-                  Center(
+                  SizedBox(
+                    width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _login,
                       style: ElevatedButton.styleFrom(
@@ -232,7 +233,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       child: const Text(
-                        'Sign in',
+                        'Log in',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'Roboto',
