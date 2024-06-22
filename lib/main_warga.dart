@@ -137,6 +137,7 @@ class _MainContentState extends State<MainContent> {
                   child: CircleAvatar(
                     radius: 40.0,
                     backgroundColor: Colors.white,
+                    backgroundImage: AssetImage('assets/person-icon.png'),
                   ),
                 ),
                 Column(
@@ -308,7 +309,7 @@ class _MainContentState extends State<MainContent> {
                     children: [
                       Center(
                         child: Icon(
-                          MdiIcons.receiptTextEdit,
+                          MdiIcons.receiptTextOutline,
                           color: HexColor('#253793'),
                           size: 44.0,
                         ),

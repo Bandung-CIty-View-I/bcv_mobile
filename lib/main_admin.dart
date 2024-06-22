@@ -69,11 +69,13 @@ class _MainContentAdminState extends State<MainContentAdmin> {
   final ApiService _apiService = ApiService();
   List<dynamic> _schedules = [];
   bool isLoading = true;
+  String? _name;
 
   @override
   void initState() {
     super.initState();
     _fetchSchedules();
+    _fetchName();
   }
 
   Future<void> _fetchSchedules() async {
@@ -89,6 +91,18 @@ class _MainContentAdminState extends State<MainContentAdmin> {
       });
     }
   }
+
+  Future<void> _fetchName() async {
+    try {
+      final name = await _apiService.getName();
+      setState(() {
+        _name = name;
+      });
+    } catch (e) {
+      print('error');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +130,7 @@ class _MainContentAdminState extends State<MainContentAdmin> {
                     child: CircleAvatar(
                       radius: 40.0,
                       backgroundColor: Colors.white,
+                      backgroundImage: AssetImage('assets/person-icon.png'),
                     ),
                   ),
                   Column(
@@ -132,7 +147,7 @@ class _MainContentAdminState extends State<MainContentAdmin> {
                       ),
                       SizedBox(height: 5.0),
                       Text(
-                        'Butar Aja',
+                        _name ?? 'Loading...',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -209,7 +224,7 @@ class _MainContentAdminState extends State<MainContentAdmin> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Spacer(),
+                          SizedBox(height: 30.0),
                           Container(
                             padding: EdgeInsets.all(8.0),
                             decoration: BoxDecoration(
@@ -267,7 +282,7 @@ class _MainContentAdminState extends State<MainContentAdmin> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Spacer(),
+                          SizedBox(height: 30.0),
                           Container(
                             padding: EdgeInsets.all(8.0),
                             decoration: BoxDecoration(

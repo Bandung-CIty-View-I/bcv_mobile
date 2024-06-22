@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'services/api_service.dart';
 import 'main.dart';
 
 void main() {
@@ -18,6 +17,7 @@ class DetailIPL extends StatefulWidget {
 }
 
 class _DetailIPLstate extends State<DetailIPL> {
+  final ApiService apiService = ApiService();
   String? selectedYear;
   String? selectedMonth;
   String meterAwal = "";
@@ -32,20 +32,28 @@ class _DetailIPLstate extends State<DetailIPL> {
   ];
 
   void fetchData(String year, String month) async {
-    final response = await http.get(Uri.parse('https://api.example.com/tagihan?year=$year&month=$month'));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        meterAwal = data['meterAwal'].toString();
-        meterAkhir = data['meterAkhir'].toString();
-        totalTunggakan = data['totalTunggakan'].toString();
-        totalTagihan = data['totalTagihan'].toString();
-      });
-    } else {
-      // Jika gagal mengambil data dari API
-      throw Exception('Failed to load data');
-    }
+    // Konversi nama bulan menjadi dua digit angka
+    final monthIndex = months.indexOf(month) + 1; // Index dimulai dari 0
+    final monthString = monthIndex.toString().padLeft(2, '0');
+    final yearMonth = year + monthString;
+    
+  //   try {
+  //     // final data = await apiService.getBillDetails(yearMonth);
+  //     int tunggakan = 0;
+  //     data.forEach((key, value) {
+  //       if (key.startsWith('tunggakan_')) {
+  //         tunggakan += int.parse(value.toString());
+  //       }
+  //     });
+  //     setState(() {
+  //       meterAwal = data['meter_awal'].toString();
+  //       meterAkhir = data['meter_akhir'].toString();
+  //       totalTunggakan = tunggakan.toString();
+  //       totalTagihan = data['total_tag'].toString();
+  //     });
+  //   } catch (e) {
+  //     print('Failed to load data: $e');
+  //   }
   }
 
   @override
@@ -93,9 +101,6 @@ class _DetailIPLstate extends State<DetailIPL> {
               onChanged: (newValue) {
                 setState(() {
                   selectedYear = newValue;
-                  if (selectedYear != null && selectedMonth != null) {
-                    fetchData(selectedYear!, selectedMonth!);
-                  }
                 });
               },
             ),
@@ -108,15 +113,40 @@ class _DetailIPLstate extends State<DetailIPL> {
                   value: value,
                   child: Text(value),
                 );
-              }).toList(),
+              }).toList(),             
               onChanged: (newValue) {
                 setState(() {
                   selectedMonth = newValue;
-                  if (selectedYear != null && selectedMonth != null) {
-                    fetchData(selectedYear!, selectedMonth!);
-                  }
                 });
               },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                if (selectedYear != null && selectedMonth != null) {
+                  fetchData(selectedYear!, selectedMonth!);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Silahkan pilih tahun dan bulan!')),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(double.infinity, 50),
+                backgroundColor: HexColor("#FE8660"), 
+                elevation: 10.0,
+                shadowColor: Colors.black.withOpacity(1.0),
+              ),
+                
+              child: const Text(
+                  'Cari',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Roboto',
+                    fontSize: 20.0,
+                  ),
+                ),
             ),
             const SizedBox(height: 20),
             Expanded(

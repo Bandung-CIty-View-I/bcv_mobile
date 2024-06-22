@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/screens/splash_screen.dart';
+import 'screens/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/api_service.dart';
 import 'main_warga.dart';
@@ -57,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
             context,
             MaterialPageRoute(builder: (context) => Dashboard1()),
           );
+          
         } else if (response['role'] == 'admin') {
           await _apiService.saveToken(response['access_token']);
           Navigator.pushReplacement(

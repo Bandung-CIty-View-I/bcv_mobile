@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-// import 'dart:convert';
+import 'dart:convert';
 import 'dart:io';
-// import 'package:http/http.dart' as http;
-import 'services/api_service.dart'; // Import ApiService
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MaterialApp(
@@ -22,58 +19,47 @@ class InputIPL extends StatefulWidget {
 }
 
 class _InputIPLstate extends State<InputIPL> {
-  final TextEditingController namaController = TextEditingController();
+  final TextEditingController meterAkhirController = TextEditingController();
   File? _image;
   final picker = ImagePicker();
 
-  String? _nama;
-
-  List<String> blokList = ['A', 'B', 'C'];
-  List<String> nomorKavlingList = [];
-  String? selectedBlok;
-  String? selectedNomorKavling;
+  List<String> nomorRumahList = [];
+  String? selectedNomorRumah;
   String meterAwal = "";
 
-  final ApiService _apiService = ApiService(); // Instantiate ApiService
+  @override
+  void initState() {
+    super.initState();
+    fetchNomorRumahList();
+  }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _submitData();
-  // }
+  Future<void> fetchNomorRumahList() async {
+    final response = await http.get(Uri.parse('https://api.example.com/nomor-rumah'));
 
-  // Future<void> _fetchName() async{
-  //   try{
-  //     final String fetchedName = await _apiService.getNameBills(selectedNomorKavling.text, selectedBlok.text);
-  //     setState(() {
-  //       _nama = fetchedName;
-  //     });    
-  //   } catch(e) {
-  //       print(e);
-  //   }
-  // }
-
-  void fetchNomorKavlingList(String blok) {
-    print('Fetching nomor kavling untuk blok: $blok');
-    if (blok == 'A') {
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body) as List;
       setState(() {
-        nomorKavlingList = ['A1'];
-        print('Nomor kavling untuk Blok A: $nomorKavlingList');
+        nomorRumahList = data.map((item) => item['nomorRumah'].toString()).toList();
       });
-    } else if (blok == 'B') {
-      setState(() {
-        nomorKavlingList = ['B1', 'B2'];
-        print('Nomor kavling untuk Blok B: $nomorKavlingList');
-      });
-    } else if (blok == 'C') {
-      setState(() {
-        nomorKavlingList = ['C1', 'C2'];
-        print('Nomor kavling untuk Blok C: $nomorKavlingList');
-      });
+    } else {
+      throw Exception('Failed to load nomor rumah');
     }
   }
 
-    Future<void> _pickImage() async {
+  Future<void> fetchMeterAwal(String nomorRumah) async {
+    final response = await http.get(Uri.parse('https://api.example.com/meter-awal?nomorRumah=$nomorRumah'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        meterAwal = data['meterAwal'].toString();
+      });
+    } else {
+      throw Exception('Failed to load meter awal');
+    }
+  }
+
+  Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     setState(() {
@@ -85,34 +71,25 @@ class _InputIPLstate extends State<InputIPL> {
     });
   }
 
-  Future<void> _saveImage() async {
-    if (_image != null) {
-      try {
-        final Directory? directory = await getExternalStorageDirectory();
-        final String path = directory!.path;
-        final String fileName = 'IPL_${DateTime.now().millisecondsSinceEpoch}.jpg';
-        final File newImage = await _image!.copy('$path/$fileName');
-
-        await GallerySaver.saveImage(newImage.path);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Foto telah disimpan di galeri anda!')),
-        );
-      } catch (e) {
-        print('Error saving image: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal menyimpan foto')),
-        );
-      }
-    }
-  }
-
   void _submitData() async {
-    final response = await _apiService.getNameBills(selectedNomorKavling!, selectedBlok!);
+    if (meterAkhirController.text.isEmpty || _image == null || selectedNomorRumah == null) {
+      // Show error message or handle invalid input
+      return;
+    }
 
-    setState(() {
-      _nama = response;
-      namaController.text = _nama!;
-    });
+    final request = http.MultipartRequest('POST', Uri.parse('https://api.example.com/input-ipl'));
+    request.fields['nomorRumah'] = selectedNomorRumah!;
+    request.fields['meterAkhir'] = meterAkhirController.text;
+    request.files.add(await http.MultipartFile.fromPath('image', _image!.path));
+
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      // Handle successful response
+    } else {
+      // Handle error response
+      throw Exception('Failed to submit data');
+    }
   }
 
   @override
@@ -149,58 +126,21 @@ class _InputIPLstate extends State<InputIPL> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  DropdownButton<String>(
-                    hint: const Text("Pilih Blok"),
-                    value: selectedBlok,
-                    items: blokList.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedBlok = newValue;
-                        selectedNomorKavling = null;
-                        nomorKavlingList = [];
-                        print('Blok dipilih: $newValue');
-                        fetchNomorKavlingList(newValue!);
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  DropdownButton<String>(
-                    hint: const Text("Pilih Nomor Kavling"),
-                    value: selectedNomorKavling,
-                    items: nomorKavlingList.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedNomorKavling = newValue;
-                        // Memanggil _submitData jika kedua dropdown sudah terpilih
-                        if (selectedBlok != null && selectedNomorKavling != null) {
-                          print('nomor yang dipilih adalah: $selectedNomorKavling dan blok $selectedBlok');
-                          _submitData();
-                        }
-                      });
-                    },
-                  ),
-                ],              
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: namaController,
-                enabled: false,
-                decoration: InputDecoration(
-                  labelText: "Nama",
-                  border: OutlineInputBorder(),
-                ),
+              DropdownButton<String>(
+                hint: const Text("Select Nomor Rumah"),
+                value: selectedNomorRumah,
+                items: nomorRumahList.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedNomorRumah = newValue;
+                    fetchMeterAwal(newValue!);
+                  });
+                },
               ),
               const SizedBox(height: 20),
               Container(
@@ -249,7 +189,7 @@ class _InputIPLstate extends State<InputIPL> {
                       ],
                     ),
                     TextField(
-                      // controller: meterAkhirController,
+                      controller: meterAkhirController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: 'Masukkan Meter Akhir',
@@ -273,7 +213,7 @@ class _InputIPLstate extends State<InputIPL> {
                               children: [
                                 Container(
                                   width: double.infinity,
-                                  height: 200,
+                                  height: 200, // Set the height as needed
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(15),
                                     border: Border.all(
@@ -290,32 +230,16 @@ class _InputIPLstate extends State<InputIPL> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    ElevatedButton.icon(
-                                      onPressed: _pickImage,
-                                      icon: Icon(MdiIcons.refresh, color: Colors.black),
-                                      label: Text(
-                                        "Ulang",
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: HexColor('#FE8660'),
-                                      ),
-                                    ),
-                                    ElevatedButton.icon(
-                                      onPressed: _saveImage,
-                                      icon: Icon(MdiIcons.contentSave, color: Colors.black),
-                                      label: Text(
-                                        "Simpan",
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: HexColor('#FE8660'),
-                                      ),
-                                    ),
-                                  ],
+                                ElevatedButton.icon(
+                                  onPressed: _pickImage,
+                                  icon: Icon(MdiIcons.refresh, color: Colors.black),
+                                  label: Text(
+                                    "Ulang",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: HexColor('#FE8660'),
+                                  ),
                                 ),
                               ],
                             ),

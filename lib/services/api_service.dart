@@ -3,10 +3,12 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String _url = 'http://34.101.66.3/api';
+  static const String _baseUrl = 'http://34.101.66.3/api';
+
+  String get baseUrl => _baseUrl;
 
   Future<Map<String, dynamic>> login(String email, String password) async {
-    const String url = '$_url/auth/login';
+    final String url = '$_baseUrl/auth/login';
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -39,7 +41,7 @@ class ApiService {
       throw Exception('Token tidak tersedia');
     }
 
-    const String url = '$_url/bills';
+    final String url = '$_baseUrl/bills';
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -63,7 +65,7 @@ class ApiService {
       throw Exception('Token tidak tersedia');
     }
 
-    const String url = '$_url/user/profile';
+    final String url = '$_baseUrl/user/profile';
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -83,19 +85,16 @@ class ApiService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    if (token == null) {
-      throw Exception('Token tidak tersedia');
-    }
-
-    const String url = '$_url/admin/find-name';
+    final String url = '$_baseUrl/admin/find-name';
     final response = await http.post(
       Uri.parse(url),
       headers: {
         'Authorization': 'Bearer $token',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: {
-        'nomor_kavling': '$nomor_kavling',
-        'blok': '$blok',
+        'nomor_kavling': nomor_kavling,
+        'blok': blok,
       },
     );
 
@@ -111,7 +110,7 @@ class ApiService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    final String url = '$_url/schedule';
+    final String url = '$_baseUrl/schedule';
     final response = await http.get(
       Uri.parse(url),
       headers: {
@@ -126,12 +125,8 @@ class ApiService {
     }
   }
 
-// -----------------------------------------------------------
-// -----------------------------------------------------------
-// -----------------------------------------------------------
-
   Future<List<String>> fetchResidents() async {
-    const String url = '$_url/residents';
+    final String url = '$_baseUrl/residents';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -144,7 +139,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> fetchResidentDetails(String residentName) async {
-    final String url = '$_url/resident?name=$residentName';
+    final String url = '$_baseUrl/resident?name=$residentName';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
