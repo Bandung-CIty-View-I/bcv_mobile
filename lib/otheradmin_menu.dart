@@ -24,6 +24,7 @@ class _OtherMenuAdminState extends State<OtherMenuAdmin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: HexColor('#F4EBE8'),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Row(
