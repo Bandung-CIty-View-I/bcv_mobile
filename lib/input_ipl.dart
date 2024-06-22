@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,16 +26,24 @@ class InputIPL extends StatefulWidget {
 
 class _InputIPLstate extends State<InputIPL> {
   final TextEditingController namaController = TextEditingController();
+  final TextEditingController meterAkhirController = TextEditingController();
+
   File? _image;
   final picker = ImagePicker();
 
   String? _nama;
 
-  List<String> blokList = ['A', 'B', 'C'];
+  List<String> blokList = ['A', 'B', 'C', 'Daytona', 'Estoril', 'Imola', 'Indiana Polis', 'Interlagos', 'Laguna Seca', 'Le Mans', 'Monaco', 'Monza', 'Silverstone'];
   List<String> nomorKavlingList = [];
   String? selectedBlok;
   String? selectedNomorKavling;
-  String meterAwal = "";
+  int? meterAwal;
+  int? biayaIPL;
+  int? user_id;
+  int? tunggakan_1;
+  int? tunggakan_2;
+  int? tunggakan_3;
+  int? last_month_bills;
 
   final ApiService _apiService = ApiService(); // Instantiate ApiService
 
@@ -53,22 +64,60 @@ class _InputIPLstate extends State<InputIPL> {
   //   }
   // }
 
+  Future<void> _inpulIPL(meterAkhir) async{
+    int? tunggakan_1_new, tunggakan_2_new, tunggakan_3_new;
+    try{
+      final String FormatTanggal = DateFormat('yyyyMM').format(DateTime.now());
+
+      // Pengecekan tunggakan bulan lalu
+      if (tunggakan_1 != null){
+        if (tunggakan_2 != null){
+          tunggakan_3_new = tunggakan_3! + tunggakan_2!;
+          tunggakan_2_new = tunggakan_1!;
+          tunggakan_1_new = last_month_bills!;
+        } else {
+          tunggakan_2_new = tunggakan_1!;
+          tunggakan_1_new = last_month_bills!;
+        }
+      }
+
+      final response = await _apiService.inputIPL(
+        user_id!, 0, FormatTanggal, biayaIPL!, meterAwal!, meterAkhir, tunggakan_1_new!, tunggakan_2_new!, tunggakan_3_new!
+      );
+
+      if (response != null && response.containsKey('success') && response['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Data berhasil dikirim')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal mengirim data, silakan coba lagi')),
+        );
+      }
+
+    } catch(e){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal mengirim data, silakan coba lagi')),
+      );
+    }
+  }
+
   void fetchNomorKavlingList(String blok) {
-    print('Fetching nomor kavling untuk blok: $blok');
     if (blok == 'A') {
       setState(() {
         nomorKavlingList = ['A1'];
-        print('Nomor kavling untuk Blok A: $nomorKavlingList');
       });
     } else if (blok == 'B') {
       setState(() {
         nomorKavlingList = ['B1', 'B2'];
-        print('Nomor kavling untuk Blok B: $nomorKavlingList');
       });
     } else if (blok == 'C') {
       setState(() {
         nomorKavlingList = ['C1', 'C2'];
-        print('Nomor kavling untuk Blok C: $nomorKavlingList');
+      });
+    } else if (blok == 'Daytona') {
+      setState(() {
+        nomorKavlingList = ['110'];
       });
     }
   }
@@ -90,7 +139,8 @@ class _InputIPLstate extends State<InputIPL> {
       try {
         final Directory? directory = await getExternalStorageDirectory();
         final String path = directory!.path;
-        final String fileName = 'IPL_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final String FormatTanggal = DateFormat('yyyyMMdd_HH:mm').format(DateTime.now());
+        final String fileName = '${selectedBlok}_${selectedNomorKavling}_${FormatTanggal}.jpg';
         final File newImage = await _image!.copy('$path/$fileName');
 
         await GallerySaver.saveImage(newImage.path);
@@ -106,13 +156,69 @@ class _InputIPLstate extends State<InputIPL> {
     }
   }
 
-  void _submitData() async {
+  void _checkNameAndMeterAwal() async {
     final response = await _apiService.getNameBills(selectedNomorKavling!, selectedBlok!);
+    final bills = await _apiService.getBills();
+    final int meter_akhir = bills['meter_akhir'];
+    final int hargaipl = bills['ipl'];
+    final int userid = bills['user_id'];
+    final int tunggakan1 = bills['tunggakan_1'];
+    final int tunggakan2 = bills['tunggakan_2'];
+    final int tunggakan3 = bills['tunggakan_3'];
+    final int lastMonthBills = bills['tag_now'];
 
     setState(() {
       _nama = response;
       namaController.text = _nama!;
+      meterAwal = meter_akhir;
+      biayaIPL = hargaipl;
+      user_id = userid;
+      tunggakan_1 = tunggakan1;
+      tunggakan_2 = tunggakan2;
+      tunggakan_3 = tunggakan3;
+      last_month_bills = lastMonthBills;
     });
+  }
+
+  void _submitData() {
+    final String meterAkhirText = meterAkhirController.text;
+
+    if (meterAkhirText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Meter akhir harus diisi terlebih dahulu!')),
+      );
+      return;
+    }
+    if (selectedBlok == null || selectedBlok!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Blok harus diisi terlebih dahulu!')),
+      );
+      return;
+    }
+    if (selectedNomorKavling == null || selectedNomorKavling!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Nomor Kavling harus diisi terlebih dahulu!')),
+      );
+      return;
+    }
+    if (_image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Anda harus mengambil gambar terlebih dahulu!')),
+      );
+      return;
+    }
+
+    final int? meterAkhir = int.tryParse(meterAkhirText);
+
+    if (meterAkhir! < meterAwal!) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Pastikan besaran meter akhir! Meter akhir tidak dapat kurang dari meter awal!')),
+      );
+      return;
+    }
+
+    _inpulIPL(meterAkhir);
+
   }
 
   @override
@@ -165,7 +271,6 @@ class _InputIPLstate extends State<InputIPL> {
                         selectedBlok = newValue;
                         selectedNomorKavling = null;
                         nomorKavlingList = [];
-                        print('Blok dipilih: $newValue');
                         fetchNomorKavlingList(newValue!);
                       });
                     },
@@ -185,8 +290,7 @@ class _InputIPLstate extends State<InputIPL> {
                         selectedNomorKavling = newValue;
                         // Memanggil _submitData jika kedua dropdown sudah terpilih
                         if (selectedBlok != null && selectedNomorKavling != null) {
-                          print('nomor yang dipilih adalah: $selectedNomorKavling dan blok $selectedBlok');
-                          _submitData();
+                          _checkNameAndMeterAwal();
                         }
                       });
                     },
@@ -226,13 +330,14 @@ class _InputIPLstate extends State<InputIPL> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10.0),
                     Text(
-                      meterAwal,
+                      meterAwal != null ? meterAwal.toString() : '-',
                       style: const TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 16.0,
                       ),
                     ),
-                    const SizedBox(height: 20.0),
+                    const SizedBox(height: 5.0),
                     Divider(color: Colors.black),
                     const SizedBox(height: 20.0),
                     Row(
@@ -249,7 +354,7 @@ class _InputIPLstate extends State<InputIPL> {
                       ],
                     ),
                     TextField(
-                      // controller: meterAkhirController,
+                      controller: meterAkhirController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: 'Masukkan Meter Akhir',
@@ -337,7 +442,7 @@ class _InputIPLstate extends State<InputIPL> {
                 child: Container(
                   width: double.infinity,
                   alignment: Alignment.center,
-                  child: Text("Input IPL", style: TextStyle(color: Colors.black)),
+                  child: Text("Unggah Data!", style: TextStyle(color: Colors.black)),
                 ),
               ),
             ],

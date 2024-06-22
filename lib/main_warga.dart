@@ -94,8 +94,9 @@ class _MainContentState extends State<MainContent> {
   Future<void> _fetchBills() async {
     try {
       final bills = await _apiService.getBills();
+      final int totalTag = bills['total_tag'];
       setState(() {
-        _bills = bills;
+        _bills = totalTag;
       });
     } catch (e) {
       print('error');

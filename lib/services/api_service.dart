@@ -33,7 +33,7 @@ class ApiService {
     await prefs.setString('access_token', token);
   }
 
-  Future<int> getBills() async {
+  Future<Map<String, dynamic>> getBills() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
@@ -51,7 +51,7 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final responseBody = json.decode(response.body);
-      return responseBody[0]['total_tag'].toInt();
+      return responseBody[0] as Map<String, dynamic>;
     } else {
       throw Exception('Failed to send request');
     }
@@ -124,6 +124,40 @@ class ApiService {
       throw Exception('Failed to send request');
     }
   }
+
+  Future<Map<String, dynamic>> inputIPL(int user_id, int paid_stat, String tahunBulan, int IPL, int meterAwal, int meterAkhir, int tunggakan1, int tunggakan2, int tunggakan3) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final String url = '$_baseUrl/admin/bills/add/';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: {
+        'user_id': user_id,
+        'paid': paid_stat,
+        'thn_bl': tahunBulan,
+        'ipl': IPL,
+        'meter_awal': meterAwal,
+        'meter_akhir': meterAkhir,
+        'tunggakan_1': tunggakan1,
+        'tunggakan_2': tunggakan2,
+        'tunggakan_3': tunggakan3,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
+      return responseBody;
+    } else {
+      throw Exception('Failed to send request');
+    }
+  }
+
+//==========================================================================================================================================
 
   Future<List<String>> fetchResidents() async {
     final String url = '$_baseUrl/residents';
