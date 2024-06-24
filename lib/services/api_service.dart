@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String _baseUrl = 'http://34.101.66.3/api';
+  static const String _baseUrl = 'https://bcv1.my.id/api';
 
   String get baseUrl => _baseUrl;
 
@@ -81,7 +81,7 @@ class ApiService {
     }
   }
 
-  Future<String> getNameBills(String nomor_kavling, String blok) async {
+  Future<Map<String, dynamic>> getNameBills(String nomor_kavling, String blok) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
@@ -100,7 +100,7 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final responseBody = json.decode(response.body);
-      return responseBody['nama'].toString();
+      return responseBody as Map<String, dynamic>;
     } else {
       throw Exception('Failed to send request');
     }
@@ -120,6 +120,30 @@ class ApiService {
 
     if (response.statusCode == 200) {
       return json.decode(response.body) as List<dynamic>;
+    } else {
+      throw Exception('Failed to send request');
+    }
+  }
+
+  Future<Map<String, dynamic>> getBillDetail(int user_id) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final String url = '$_baseUrl/admin/get-meter-awal';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: {
+        'user_id': user_id,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
+      return responseBody as Map<String, dynamic>;
     } else {
       throw Exception('Failed to send request');
     }

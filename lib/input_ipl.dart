@@ -64,7 +64,7 @@ class _InputIPLstate extends State<InputIPL> {
   //   }
   // }
 
-  Future<void> _inpulIPL(meterAkhir) async{
+  Future<void> _inputIPL(meterAkhir) async{
     int? tunggakan_1_new, tunggakan_2_new, tunggakan_3_new;
     try{
       final String FormatTanggal = DateFormat('yyyyMM').format(DateTime.now());
@@ -158,17 +158,21 @@ class _InputIPLstate extends State<InputIPL> {
 
   void _checkNameAndMeterAwal() async {
     final response = await _apiService.getNameBills(selectedNomorKavling!, selectedBlok!);
-    final bills = await _apiService.getBills();
-    final int meter_akhir = bills['meter_akhir'];
-    final int hargaipl = bills['ipl'];
-    final int userid = bills['user_id'];
-    final int tunggakan1 = bills['tunggakan_1'];
-    final int tunggakan2 = bills['tunggakan_2'];
-    final int tunggakan3 = bills['tunggakan_3'];
-    final int lastMonthBills = bills['tag_now'];
+
+    final String nama = response['nama'];
+    final int userid = response['user_id'];
+
+    final billDetail = await _apiService.getBillDetail(userid);
+
+    final int meter_akhir = billDetail['meter_akhir'];
+    final int hargaipl = billDetail['ipl'];
+    final int tunggakan1 = billDetail['tunggakan_1'];
+    final int tunggakan2 = billDetail['tunggakan_2'];
+    final int tunggakan3 = billDetail['tunggakan_3'];
+    final int lastMonthBills = billDetail['tag_now'];
 
     setState(() {
-      _nama = response;
+      _nama = nama;
       namaController.text = _nama!;
       meterAwal = meter_akhir;
       biayaIPL = hargaipl;
@@ -217,7 +221,7 @@ class _InputIPLstate extends State<InputIPL> {
       return;
     }
 
-    _inpulIPL(meterAkhir);
+    _inputIPL(meterAkhir);
 
   }
 
