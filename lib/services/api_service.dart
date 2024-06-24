@@ -137,7 +137,7 @@ class ApiService {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: {
-        'user_id': user_id,
+        'user_id': user_id.toString(),
       },
     );
 
@@ -149,7 +149,7 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> inputIPL(int user_id, int paid_stat, String tahunBulan, int IPL, int meterAwal, int meterAkhir, int tunggakan1, int tunggakan2, int tunggakan3) async {
+  Future<int> inputIPL(int user_id, int paid_stat, String tahunBulan, int IPL, int meterAwal, int meterAkhir, int tunggakan1, int tunggakan2, int tunggakan3) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
@@ -161,21 +161,20 @@ class ApiService {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: {
-        'user_id': user_id,
-        'paid': paid_stat,
+        'user_id': user_id.toString(),
+        'paid': paid_stat.toString(),
         'thn_bl': tahunBulan,
-        'ipl': IPL,
-        'meter_awal': meterAwal,
-        'meter_akhir': meterAkhir,
-        'tunggakan_1': tunggakan1,
-        'tunggakan_2': tunggakan2,
-        'tunggakan_3': tunggakan3,
+        'ipl': IPL.toString(),
+        'meter_awal': meterAwal.toString(),
+        'meter_akhir': meterAkhir.toString(),
+        'tunggakan_1': tunggakan1.toString(),
+        'tunggakan_2': tunggakan2.toString(),
+        'tunggakan_3': tunggakan3.toString(),
       },
     );
 
     if (response.statusCode == 200) {
-      final responseBody = json.decode(response.body);
-      return responseBody;
+      return response.statusCode;
     } else {
       throw Exception('Failed to send request');
     }

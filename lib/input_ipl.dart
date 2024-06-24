@@ -85,7 +85,7 @@ class _InputIPLstate extends State<InputIPL> {
         user_id!, 0, FormatTanggal, biayaIPL!, meterAwal!, meterAkhir, tunggakan_1_new!, tunggakan_2_new!, tunggakan_3_new!
       );
 
-      if (response != null && response.containsKey('success') && response['success'] == true) {
+      if (response == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Data berhasil dikirim')),
         );
