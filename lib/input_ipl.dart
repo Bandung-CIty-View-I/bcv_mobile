@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -47,23 +45,6 @@ class _InputIPLstate extends State<InputIPL> {
 
   final ApiService _apiService = ApiService(); // Instantiate ApiService
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _submitData();
-  // }
-
-  // Future<void> _fetchName() async{
-  //   try{
-  //     final String fetchedName = await _apiService.getNameBills(selectedNomorKavling.text, selectedBlok.text);
-  //     setState(() {
-  //       _nama = fetchedName;
-  //     });    
-  //   } catch(e) {
-  //       print(e);
-  //   }
-  // }
-
   Future<void> _inputIPL(meterAkhir) async{
     int? tunggakan_1_new, tunggakan_2_new, tunggakan_3_new;
     try{
@@ -82,7 +63,7 @@ class _InputIPLstate extends State<InputIPL> {
       }
 
       final response = await _apiService.inputIPL(
-        user_id!, 0, FormatTanggal, biayaIPL!, meterAwal!, meterAkhir, tunggakan_1_new!, tunggakan_2_new!, tunggakan_3_new!
+        user_id!, 0, FormatTanggal, biayaIPL!, meterAwal!, meterAkhir, tunggakan_1_new ?? 0, tunggakan_2_new ?? 0, tunggakan_3_new ?? 0
       );
 
       if (response == 200) {
@@ -94,11 +75,11 @@ class _InputIPLstate extends State<InputIPL> {
           SnackBar(content: Text('Gagal mengirim data, silakan coba lagi')),
         );
       }
-
     } catch(e){
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal mengirim data, silakan coba lagi')),
       );
+      throw e;
     }
   }
 
@@ -187,12 +168,6 @@ class _InputIPLstate extends State<InputIPL> {
   void _submitData() {
     final String meterAkhirText = meterAkhirController.text;
 
-    if (meterAkhirText.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Meter akhir harus diisi terlebih dahulu!')),
-      );
-      return;
-    }
     if (selectedBlok == null || selectedBlok!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Blok harus diisi terlebih dahulu!')),
@@ -202,6 +177,12 @@ class _InputIPLstate extends State<InputIPL> {
     if (selectedNomorKavling == null || selectedNomorKavling!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Nomor Kavling harus diisi terlebih dahulu!')),
+      );
+      return;
+    }
+    if (meterAkhirText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Meter akhir harus diisi terlebih dahulu!')),
       );
       return;
     }

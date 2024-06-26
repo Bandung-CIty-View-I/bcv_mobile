@@ -153,7 +153,7 @@ class ApiService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    final String url = '$_baseUrl/admin/bills/add/';
+    final String url = '$_baseUrl/admin/bills/add';
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -176,6 +176,8 @@ class ApiService {
     if (response.statusCode == 200) {
       return response.statusCode;
     } else {
+      print('Request Headers: ${response.headers}');
+      print('Request Body: ${response.body}');
       throw Exception('Failed to send request');
     }
   }
