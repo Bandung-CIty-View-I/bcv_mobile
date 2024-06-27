@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'services/api_service.dart';
 import 'main.dart';
@@ -9,6 +10,11 @@ void main() {
   ));
 }
 
+String formatRupiah(int number) {
+  final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
+  return formatCurrency.format(number);
+}
+
 class DetailIPL extends StatefulWidget {
   const DetailIPL({super.key});
 
@@ -17,7 +23,7 @@ class DetailIPL extends StatefulWidget {
 }
 
 class _DetailIPLstate extends State<DetailIPL> {
-  final ApiService apiService = ApiService();
+  final ApiService _apiService = ApiService();
   String? selectedYear;
   String? selectedMonth;
   String meterAwal = "";
@@ -31,29 +37,37 @@ class _DetailIPLstate extends State<DetailIPL> {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  void fetchData(String year, String month) async {
-    // Konversi nama bulan menjadi dua digit angka
-    final monthIndex = months.indexOf(month) + 1; // Index dimulai dari 0
-    final monthString = monthIndex.toString().padLeft(2, '0');
-    final yearMonth = year + monthString;
-    
-  //   try {
-  //     // final data = await apiService.getBillDetails(yearMonth);
-  //     int tunggakan = 0;
-  //     data.forEach((key, value) {
-  //       if (key.startsWith('tunggakan_')) {
-  //         tunggakan += int.parse(value.toString());
-  //       }
-  //     });
-  //     setState(() {
-  //       meterAwal = data['meter_awal'].toString();
-  //       meterAkhir = data['meter_akhir'].toString();
-  //       totalTunggakan = tunggakan.toString();
-  //       totalTagihan = data['total_tag'].toString();
-  //     });
-  //   } catch (e) {
-  //     print('Failed to load data: $e');
-  //   }
+  String getMonthNumber(String month) {
+    final DateTime date = DateFormat.MMMM().parse(month);
+    return DateFormat('MM').format(date);
+  }
+
+
+  void fetchData() async {
+    if (selectedYear != null && selectedMonth != null) {
+      String monthNumber = getMonthNumber(selectedMonth!);
+      String thnBl = '$selectedYear$monthNumber';
+
+      // Panggil API service
+      var response = await _apiService.getBillByMonth(thnBl);
+
+      if (response['status'] == 200) {
+        int tunggakan_1 = response['data']['tunggakan_1'];
+        int tunggakan_2 = response['data']['tunggakan_2'];
+        int tunggakan_3 = response['data']['tunggakan_3'];
+        int tunggakan_total = tunggakan_1 + tunggakan_2 + tunggakan_3;
+        setState(() {
+          meterAwal = response['data']['meter_awal'].toString();
+          meterAkhir = response['data']['meter_akhir'].toString();
+          totalTunggakan = formatRupiah(tunggakan_total);
+          totalTagihan = formatRupiah(response['data']['total_tag']);
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    }
   }
 
   @override
@@ -90,41 +104,43 @@ class _DetailIPLstate extends State<DetailIPL> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             DropdownButton<String>(
-              hint: const Text("Select Year"),
+              hint: Text('Select Year'),
               value: selectedYear,
-              items: years.map((String value) {
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedYear = newValue;
+                });
+              },
+              items: years.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
                 );
               }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  selectedYear = newValue;
-                });
-              },
             ),
+
             const SizedBox(height: 20),
             DropdownButton<String>(
-              hint: const Text("Select Month"),
+              hint: Text('Select Month'),
               value: selectedMonth,
-              items: months.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),             
-              onChanged: (newValue) {
+              onChanged: (String? newValue) {
                 setState(() {
                   selectedMonth = newValue;
                 });
               },
+              items: months.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
+
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 if (selectedYear != null && selectedMonth != null) {
-                  fetchData(selectedYear!, selectedMonth!);
+                  fetchData();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Silahkan pilih tahun dan bulan!')),
@@ -173,13 +189,14 @@ class _DetailIPLstate extends State<DetailIPL> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10.0),
                     Text(
                       meterAwal,
                       style: const TextStyle(
                         fontSize: 18.0,
                       ),
                     ),
-                    const SizedBox(height: 20.0),
+                    const SizedBox(height: 5.0),
                     Divider(color: Colors.black),
                     const SizedBox(height: 20.0),
                     Row(
@@ -195,13 +212,14 @@ class _DetailIPLstate extends State<DetailIPL> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10.0),
                     Text(
                       meterAkhir,
                       style: const TextStyle(
-                        fontSize: 18.0,
+                        fontSize  : 18.0,
                       ),
                     ),
-                    const SizedBox(height: 20.0),
+                    const SizedBox(height: 5.0),
                     Divider(color: Colors.black),
                     const SizedBox(height: 20.0),
                     Row(
@@ -217,13 +235,14 @@ class _DetailIPLstate extends State<DetailIPL> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10.0),
                     Text(
                       totalTunggakan,
                       style: const TextStyle(
                         fontSize: 18.0,
                       ),
                     ),
-                    const SizedBox(height: 20.0),
+                    const SizedBox(height: 5.0),
                     Divider(color: Colors.black),
                     const SizedBox(height: 20.0),
                     Row(
@@ -239,12 +258,16 @@ class _DetailIPLstate extends State<DetailIPL> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10.0),
                     Text(
                       totalTagihan,
                       style: const TextStyle(
                         fontSize: 18.0,
                       ),
                     ),
+                    const SizedBox(height: 5.0),
+                    Divider(color: Colors.black),
+
                   ],
                 ),
               ),

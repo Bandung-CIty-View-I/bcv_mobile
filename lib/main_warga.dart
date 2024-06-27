@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'tagihan_ipl_warga.dart';
+import 'bayar_ipl_warga.dart';
 import 'services/api_service.dart';
 import 'navbar/navbar.dart';
 
@@ -239,52 +240,6 @@ class _MainContentState extends State<MainContent> {
             ),
           ),
 
-          // Row(
-          //   children: [
-          //     Expanded(
-          //       child: Container(
-          //         padding: const EdgeInsets.fromLTRB(24.0, 5.0, 10.0, 5.0),
-          //         decoration: BoxDecoration(
-          //           borderRadius: BorderRadius.circular(30.0),
-          //           color: Colors.indigo[800],
-          //         ),
-          //         child: Row(
-          //           children: [
-          //             Icon(
-          //               MdiIcons.trashCan,
-          //               color: HexColor('#FFFFFF'),
-          //               size: 44.0,
-          //             ),
-          //             const SizedBox(width: 8.0),
-          //             Column(
-          //               crossAxisAlignment: CrossAxisAlignment.start,
-          //               children: [
-          //                 Text(
-          //                   'Jadwal ambil sampah:',
-          //                   textAlign: TextAlign.start,
-          //                   style: TextStyle(
-          //                     color: Colors.white,
-          //                     fontFamily: 'Roboto',
-          //                     fontWeight: FontWeight.bold,
-          //                     fontSize: 20.0,
-          //                   ),
-          //                 ),
-          //                 Text(
-          //                   scheduleText,
-          //                   style: const TextStyle(
-          //                     color: Colors.white,
-          //                     fontFamily: 'Roboto',
-          //                     fontSize: 22.0,
-          //                   ),
-          //                 ),
-          //               ],
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
           const SizedBox(height: 20.0,),
           Row(
             children: [
@@ -319,6 +274,54 @@ class _MainContentState extends State<MainContent> {
                       const Center(
                         child: Text(
                           'Detail Tagihan IPL',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Roboto',
+                            fontSize: 20.0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20.0,),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const BayarIPL()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: HexColor("#FE8660"),
+                      fixedSize: const Size(0.0, 65.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      elevation: 10.0,
+                      shadowColor: Colors.black.withOpacity(1.0),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Icon(
+                          MdiIcons.receiptTextOutline,
+                          color: HexColor('#253793'),
+                          size: 44.0,
+                        ),
+                      ),
+                      const SizedBox(width: 8.0),
+                      const Center(
+                        child: Text(
+                          'Cara Bayar IPL',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.black,

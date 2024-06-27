@@ -148,6 +148,39 @@ class ApiService {
       throw Exception('Failed to send request');
     }
   }
+  Future<Map<String, dynamic>> getBillByMonth(String thn_bl) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final String url = '$_baseUrl/bills/by-month';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: {
+        'thn_bl': thn_bl,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return {
+        'status': 200,
+        'data': json.decode(response.body),
+      };
+    } else if (response.statusCode == 404) {
+      return {
+        'status': 404,
+        'message': 'Tagihan tidak ditemukan untuk bulan tersebut',
+      };
+    } else {
+      return {
+        'status': 500,
+        'message': 'Internal Server Error',
+      };
+    }
+  }
 
   Future<int> inputIPL(int user_id, int paid_stat, String tahunBulan, int IPL, int meterAwal, int meterAkhir, int tunggakan1, int tunggakan2, int tunggakan3) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

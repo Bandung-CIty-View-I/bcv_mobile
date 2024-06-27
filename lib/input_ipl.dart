@@ -15,6 +15,19 @@ void main() {
   ));
 }
 
+String addMonthToDate(DateTime date, int monthsToAdd) {
+  int year = date.year;
+  int month = date.month + monthsToAdd;
+
+  // Adjust year and month if month goes beyond December
+  while (month > 12) {
+    month -= 12;
+    year += 1;
+  }
+
+  return DateFormat('yyyyMM').format(DateTime(year, month));
+}
+
 class InputIPL extends StatefulWidget {
   const InputIPL({super.key});
 
@@ -42,24 +55,34 @@ class _InputIPLstate extends State<InputIPL> {
   int? tunggakan_2;
   int? tunggakan_3;
   int? last_month_bills;
+  int? last_month_paid;
 
   final ApiService _apiService = ApiService(); // Instantiate ApiService
 
+  final String FormatTanggal = addMonthToDate(DateTime.now(), 1);
+  
   Future<void> _inputIPL(meterAkhir) async{
     int? tunggakan_1_new, tunggakan_2_new, tunggakan_3_new;
     try{
-      final String FormatTanggal = DateFormat('yyyyMM').format(DateTime.now());
 
       // Pengecekan tunggakan bulan lalu
-      if (tunggakan_1 != null){
-        if (tunggakan_2 != null){
-          tunggakan_3_new = tunggakan_3! + tunggakan_2!;
-          tunggakan_2_new = tunggakan_1!;
-          tunggakan_1_new = last_month_bills!;
+      if (last_month_paid == 0){
+        if (tunggakan_1 != null){
+          if (tunggakan_2 != null){
+            tunggakan_3_new = tunggakan_3! + tunggakan_2!;
+            tunggakan_2_new = tunggakan_1!;
+            tunggakan_1_new = last_month_bills!;
+          } else {
+            tunggakan_2_new = tunggakan_1!;
+            tunggakan_1_new = last_month_bills!;
+          }
         } else {
-          tunggakan_2_new = tunggakan_1!;
           tunggakan_1_new = last_month_bills!;
         }
+      } else {
+        tunggakan_1_new = 0;
+        tunggakan_2_new = 0;
+        tunggakan_3_new = 0;
       }
 
       final response = await _apiService.inputIPL(
@@ -121,7 +144,7 @@ class _InputIPLstate extends State<InputIPL> {
         final Directory? directory = await getExternalStorageDirectory();
         final String path = directory!.path;
         final String FormatTanggal = DateFormat('yyyyMMdd_HH:mm').format(DateTime.now());
-        final String fileName = '${selectedBlok}_${selectedNomorKavling}_${FormatTanggal}.jpg';
+        final String fileName = '${selectedBlok}_${selectedNomorKavling}_Taken@${FormatTanggal}.jpg';
         final File newImage = await _image!.copy('$path/$fileName');
 
         await GallerySaver.saveImage(newImage.path);
@@ -151,6 +174,7 @@ class _InputIPLstate extends State<InputIPL> {
     final int tunggakan2 = billDetail['tunggakan_2'];
     final int tunggakan3 = billDetail['tunggakan_3'];
     final int lastMonthBills = billDetail['tag_now'];
+    final int lastMonthPaid = billDetail['paid'];
 
     setState(() {
       _nama = nama;
@@ -162,6 +186,7 @@ class _InputIPLstate extends State<InputIPL> {
       tunggakan_2 = tunggakan2;
       tunggakan_3 = tunggakan3;
       last_month_bills = lastMonthBills;
+      last_month_paid = lastMonthPaid;
     });
   }
 
