@@ -51,7 +51,9 @@ class _Dashboard1State extends State<Dashboard1> {
           backgroundColor: Colors.indigo[800],
           elevation: 0.0,
         ),
-        body: MainContent(),
+        body: SingleChildScrollView(
+          child: MainContent(),
+        )
       ),
     );
   }
