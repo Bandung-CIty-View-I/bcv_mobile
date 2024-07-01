@@ -125,6 +125,25 @@ class ApiService {
     }
   }
 
+  Future<List<dynamic>> getContacts() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final String url = '$_baseUrl/contacts';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body) as List<dynamic>;
+    } else {
+      throw Exception('Failed to send request');
+    }
+  }
+
   Future<Map<String, dynamic>> getBillDetail(int user_id) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
