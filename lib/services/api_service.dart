@@ -233,30 +233,4 @@ class ApiService {
       throw Exception('Failed to send request');
     }
   }
-
-//==========================================================================================================================================
-
-  Future<List<String>> fetchResidents() async {
-    final String url = '$_baseUrl/residents';
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return List<String>.from(
-          data.map((resident) => resident['name'].toString()));
-    } else {
-      throw Exception('Failed to load residents');
-    }
-  }
-
-  Future<Map<String, dynamic>> fetchResidentDetails(String residentName) async {
-    final String url = '$_baseUrl/resident?name=$residentName';
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load resident details');
-    }
-  }
 }

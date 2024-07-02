@@ -42,7 +42,6 @@ class _DetailIPLstate extends State<DetailIPL> {
     return DateFormat('MM').format(date);
   }
 
-
   void fetchData() async {
     if (selectedYear != null && selectedMonth != null) {
       String monthNumber = getMonthNumber(selectedMonth!);
@@ -90,7 +89,7 @@ class _DetailIPLstate extends State<DetailIPL> {
           icon: Icon(
             MdiIcons.arrowLeft,
             color: Colors.white,
-            ),
+          ),
           iconSize: 40.0,
           alignment: Alignment.topLeft,
           onPressed: () {
@@ -98,63 +97,61 @@ class _DetailIPLstate extends State<DetailIPL> {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            DropdownButton<String>(
-              hint: Text('Select Year'),
-              value: selectedYear,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedYear = newValue;
-                });
-              },
-              items: years.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: 20),
-            DropdownButton<String>(
-              hint: Text('Select Month'),
-              value: selectedMonth,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedMonth = newValue;
-                });
-              },
-              items: months.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                if (selectedYear != null && selectedMonth != null) {
-                  fetchData();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Silahkan pilih tahun dan bulan!')),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              DropdownButton<String>(
+                hint: Text('Select Year'),
+                value: selectedYear,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedYear = newValue;
+                  });
+                },
+                items: years.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
                   );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
-                backgroundColor: HexColor("#FE8660"), 
-                elevation: 10.0,
-                shadowColor: Colors.black.withOpacity(1.0),
+                }).toList(),
               ),
-                
-              child: const Text(
+              const SizedBox(height: 20),
+              DropdownButton<String>(
+                hint: Text('Select Month'),
+                value: selectedMonth,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedMonth = newValue;
+                  });
+                },
+                items: months.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (selectedYear != null && selectedMonth != null) {
+                    fetchData();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Silahkan pilih tahun dan bulan!')),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50),
+                  backgroundColor: HexColor("#FE8660"), 
+                  elevation: 10.0,
+                  shadowColor: Colors.black.withOpacity(1.0),
+                ),
+                child: const Text(
                   'Cari',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -163,10 +160,9 @@ class _DetailIPLstate extends State<DetailIPL> {
                     fontSize: 20.0,
                   ),
                 ),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: Container(
+              ),
+              const SizedBox(height: 20),
+              Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
@@ -216,7 +212,7 @@ class _DetailIPLstate extends State<DetailIPL> {
                     Text(
                       meterAkhir,
                       style: const TextStyle(
-                        fontSize  : 18.0,
+                        fontSize: 18.0,
                       ),
                     ),
                     const SizedBox(height: 5.0),
@@ -267,12 +263,11 @@ class _DetailIPLstate extends State<DetailIPL> {
                     ),
                     const SizedBox(height: 5.0),
                     Divider(color: Colors.black),
-
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

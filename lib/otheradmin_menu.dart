@@ -39,29 +39,29 @@ class _OtherMenuAdminState extends State<OtherMenuAdmin> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const DetailProfil()),
-                        );
-                      },
-                      icon: Icon(
-                        MdiIcons.accountCircle,
-                        color: HexColor('#253793'),
-                        size: 50.0,
-                      ),
-                      label: const Text(
-                        'Profil Warga',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: 'Roboto',
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    // TextButton.icon(
+                    //   onPressed: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //           builder: (context) => const DetailProfil()),
+                    //     );
+                    //   },
+                    //   icon: Icon(
+                    //     MdiIcons.accountCircle,
+                    //     color: HexColor('#253793'),
+                    //     size: 50.0,
+                    //   ),
+                    //   label: const Text(
+                    //     'Profil Warga',
+                    //     style: TextStyle(
+                    //       color: Colors.black,
+                    //       fontFamily: 'Roboto',
+                    //       fontSize: 20.0,
+                    //       fontWeight: FontWeight.bold,
+                    //     ),
+                    //   ),
+                    // ),
                     TextButton.icon(
                       onPressed: () => _logout(context), // Panggil fungsi logout
                       icon: Icon(
