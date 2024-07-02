@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:632085793199:android:e4ef41aaa70c963ad2c75a",
+        "mobilesdk_app_id": "1:632085793199:android:1c88b8e559fdb19cd2c75a",
         "android_client_info": {
-          "package_name": "com.example.pro_tav1"
+          "package_name": "com.telyu.bcv1"
         }
       },
       "oauth_client": [],

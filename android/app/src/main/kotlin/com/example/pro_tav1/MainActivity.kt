@@ -1,4 +1,4 @@
-package com.example.pro_tav1
+package com.example.bcv_mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,6 +1,6 @@
 // import 'package:flutter/material.dart';
-// import 'package:pro_tav1/input_ipl.dart';
-// import 'package:pro_tav1/statusalat_page.dart';
+// import 'package:bcv_mobile/input_ipl.dart';
+// import 'package:bcv_mobile/statusalat_page.dart';
 // import 'otheradmin_menu.dart';
 
 // void main() => runApp(MyApp());
