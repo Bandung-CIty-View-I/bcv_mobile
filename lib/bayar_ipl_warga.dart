@@ -27,7 +27,7 @@ class _BayarIPLstate extends State<BayarIPL> {
   late Future<Map<String, dynamic>> _futureBills;
   String idPelanggan = "";
   String totalTagihan = "";
-  int? _paid;
+  // int? _paid;
 
   @override
   void initState() {
