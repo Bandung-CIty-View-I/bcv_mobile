@@ -5,6 +5,7 @@ import 'tagihan_ipl_warga.dart';
 import 'bayar_ipl_warga.dart';
 import 'services/api_service.dart';
 import 'navbar/navbar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -34,26 +35,41 @@ class Dashboard1 extends StatefulWidget {
 }
 
 class _Dashboard1State extends State<Dashboard1> {
+  DateTime? currentBackPressTime;
+
+  Future<bool> onWillPop() {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null || now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      Fluttertoast.showToast(msg: "Press back again to exit");
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CustomBottomNavBar(
-      child: Scaffold(
-        backgroundColor: HexColor('#F4EBE8'),
-        appBar: AppBar(
-          title: const Text(
-            'BCV 1',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: CustomBottomNavBar(
+        child: Scaffold(
+          backgroundColor: HexColor('#F4EBE8'),
+          appBar: AppBar(
+            title: const Text(
+              'BCV 1',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            centerTitle: true,
+            backgroundColor: Colors.indigo[800],
+            elevation: 0.0,
           ),
-          centerTitle: true,
-          backgroundColor: Colors.indigo[800],
-          elevation: 0.0,
+          body: SingleChildScrollView(
+            child: MainContent(),
+          ),
         ),
-        body: SingleChildScrollView(
-          child: MainContent(),
-        )
       ),
     );
   }
