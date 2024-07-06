@@ -85,7 +85,7 @@ class _MainContentAdminState extends State<MainContentAdmin> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+          return Center(child: Text('Sesi Anda telah habis! Silahkan login kembali!'));
         } else {
           final data = snapshot.data!;
           final name = data['name'];

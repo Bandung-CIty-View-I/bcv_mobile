@@ -1,0 +1,6 @@
+-keep class com.telyu.bcv1.** { *; }
+-keep class retrofit2.** { *; }
+-keep class okhttp3.** { *; }
+-keep class okio.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
